@@ -8,7 +8,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Entity(name="trusted_contacts")
+@Entity
+@Table(name="trusted_contacts")
 public class TrustedContact {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

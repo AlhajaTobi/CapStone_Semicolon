@@ -10,8 +10,8 @@ public class AndroidManagementConfig {
 
     @Value("${android.management.enterprise.id}")
     private String enterpriseId;
-    @Value("${android.management.vault.policy.name}")
+    @Value("${android.management.policy.name}")
     private String policyName;
-    @Value("${android.management.vault.package}")
+    @Value("${android.management.package.name:com.antiTheftTracker.antiTheftTracker}")
     private String packageName;
 }

@@ -6,15 +6,16 @@ import lombok.*;
 @Getter
 @Setter
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
 @Table(name="settings")
 public class Setting {
         @Id
-        @GeneratedValue(strategy = GenerationType.UUID)
         private String key;
 
         private String value;
 
-
+        public Setting(String key, String value) {
+            this.key = key;
+            this.value = value;
+        }
 }

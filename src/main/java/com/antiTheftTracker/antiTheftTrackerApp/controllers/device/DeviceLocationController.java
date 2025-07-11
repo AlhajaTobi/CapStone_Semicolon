@@ -18,7 +18,7 @@ public class DeviceLocationController {
     @Autowired
     private DeviceLocationService locationService;
 
-    @PostMapping("/location")
+    @PostMapping("/location/update")
     public ResponseEntity<Void> updateDeviceLocation(@RequestBody DeviceLocationRequest request) {
         locationService.updateDeviceLocation(request.getDeviceId(), request);
         return ResponseEntity.accepted().build();
