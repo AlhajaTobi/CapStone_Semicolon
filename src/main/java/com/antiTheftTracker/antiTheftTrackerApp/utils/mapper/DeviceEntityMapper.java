@@ -16,15 +16,44 @@ public class DeviceEntityMapper {
 
     public static DeviceEntityResponse buildDeviceEntityResponse(DeviceEntity device) {
         DeviceLocation location = device.getCurrentLocation();
+        String deviceModel = null;
+        if (device.getDeviceDetail() != null && !device.getDeviceDetail().isEmpty()) {
+            deviceModel = device.getDeviceDetail().get(0).getDeviceModel();
+        }
+
+        String imei = null;
+        if (device.getDeviceDetail() != null && !device.getDeviceDetail().isEmpty()) {
+            imei = device.getDeviceDetail().get(0).getImei();
+        }
+
+        // Use direct location fields if currentLocation is null
+        Double latitude = null;
+        Double longitude = null;
+        LocalDateTime locationTimestamp = null;
+        
+        if (location != null) {
+            latitude = location.getLatitude();
+            longitude = location.getLongitude();
+            locationTimestamp = location.getTimestamp();
+        } else {
+            // Use direct fields from DeviceEntity
+            latitude = device.getLatitude();
+            longitude = device.getLongitude();
+            // Set timestamp to enrollment time if no location timestamp
+            locationTimestamp = device.getEnrollmentTime();
+        }
+
         return new DeviceEntityResponse(
                 device.getId(),
                 device.getPolicyName(),
                 device.getEnrollmentTime().toString(),
                 device.isStolen(),
                 device.getLastSeen(),
-                (location != null) ? location.getLatitude() : null,
-                (location != null) ? location.getLongitude() : null,
-                (location != null) ? location.getTimestamp() : null
+                latitude,
+                longitude,
+                locationTimestamp,
+                deviceModel,
+                imei
         );
     }
 

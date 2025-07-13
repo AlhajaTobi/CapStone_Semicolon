@@ -8,8 +8,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/v1/trusted-contact")
 @RequiredArgsConstructor
@@ -18,7 +20,7 @@ class TrustedContactsController {
     private final TrustedContactService trustedContactService;
 
     @PostMapping("/{deviceId}/contacts")
-    public ResponseEntity<TrustedContactResponse> addTrustedContact(@PathVariable String deviceId, @RequestBody TrustedContactRequest trustedContact) {
+    public ResponseEntity<TrustedContactResponse> addTrustedContact(@PathVariable String deviceId, @Valid @RequestBody TrustedContactRequest trustedContact) {
         trustedContactService.addTrustedContact(deviceId, trustedContact);
         return ResponseEntity.accepted().build();
     }
@@ -38,7 +40,7 @@ class TrustedContactsController {
     public ResponseEntity<TrustedContactResponse> editTrustedContact(
             @PathVariable String deviceId,
             @PathVariable String contactId,
-            @RequestBody TrustedContactRequest request
+            @Valid @RequestBody TrustedContactRequest request
     ) {
         TrustedContactResponse response = trustedContactService.editTrustedContact(deviceId, contactId, request);
         return ResponseEntity.ok(response);

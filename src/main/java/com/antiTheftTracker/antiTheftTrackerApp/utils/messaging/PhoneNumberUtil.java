@@ -42,9 +42,13 @@ public class PhoneNumberUtil {
 
     private static final Map<String, String> CARRIER_GATEWAYS = Map.of(
             "mtn", "mtnmsisdn.com",
+            "mtnmsisdn.com", "mtnmsisdn.com",
             "airtel", "airtelmail.net",
+            "airtelmail.net", "airtelmail.net",
             "glo", "gloworld.com.ng",
-            "9mobile", "emtsgsm.com"
+            "gloworld.com.ng", "gloworld.com.ng",
+            "9mobile", "emtsgsm.com",
+            "emtsgsm.com", "emtsgsm.com"
     );
     }
 

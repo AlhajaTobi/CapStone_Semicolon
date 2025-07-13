@@ -46,12 +46,14 @@ public class DeviceControllerTest {
     void setUp() {
         deviceEntityResponse = new DeviceEntityResponse(
                 "device123", "policyXYZ", "2024-01-01T00:00:00Z",
-                false, "2024-01-01T12:00:00Z", 6.5244, 3.3792, LocalDateTime.now()
+                false, "2024-01-01T12:00:00Z", 6.5244, 3.3792, LocalDateTime.now(),
+    "TecnoJ7", "2345678921"
         );
 
         deviceDetailsResponse = new DeviceDetailsResponse(
                 "device123", "Samsung", "SN123456", "123456789012345",
-                "iccid0", "iccid1", "MTN", "Airtel", "08012345678", "08087654321"
+                "6789", "iccid1", "iccid0", "Airtel", "MTN", "08087654321", "09054345677", "", 0.34, 3.56, LocalDateTime.now(), "",
+    false
         );
     }
 

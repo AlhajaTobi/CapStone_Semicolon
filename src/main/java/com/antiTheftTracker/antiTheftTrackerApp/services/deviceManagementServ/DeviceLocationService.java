@@ -4,4 +4,5 @@ import com.antiTheftTracker.antiTheftTrackerApp.dtos.request.device.DeviceLocati
 
 public interface DeviceLocationService {
     void updateDeviceLocation(String deviceId, DeviceLocationRequest request);
+    Object getDeviceLocation(String deviceId);
 }

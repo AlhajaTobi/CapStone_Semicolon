@@ -19,4 +19,6 @@ public class DeviceEntityResponse {
     private Double latitude;
     private Double longitude;
     private LocalDateTime locationTimestamp;
+    private String deviceModel;
+    private String imei;
 }

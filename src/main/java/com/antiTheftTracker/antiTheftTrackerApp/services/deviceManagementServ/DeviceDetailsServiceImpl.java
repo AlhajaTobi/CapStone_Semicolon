@@ -35,8 +35,7 @@ public class DeviceDetailsServiceImpl implements DeviceDetailsService {
         DeviceDetail deviceDetail = mapToDeviceDetails(device, deviceEntity);
         deviceDetailsRepository.save(deviceDetail);
 
-
-        return DeviceDetailsMapper.buildReturnResponse(deviceDetail);
+        return DeviceDetailsMapper.buildReturnResponse(deviceDetail, deviceEntity);
     }
 
 

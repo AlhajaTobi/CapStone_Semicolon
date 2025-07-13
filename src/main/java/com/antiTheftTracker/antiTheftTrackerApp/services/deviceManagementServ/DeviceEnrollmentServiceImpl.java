@@ -3,6 +3,7 @@ package com.antiTheftTracker.antiTheftTrackerApp.services.deviceManagementServ;
 import com.antiTheftTracker.antiTheftTrackerApp.config.AndroidManagementConfig;
 import com.antiTheftTracker.antiTheftTrackerApp.dtos.response.device.DeviceRegistrationResponse;
 import com.antiTheftTracker.antiTheftTrackerApp.utils.androidManagement.AndroidManagementFactory;
+import com.antiTheftTracker.antiTheftTrackerApp.utils.androidManagement.ServiceAccountKeyResolver;
 import com.antiTheftTracker.antiTheftTrackerApp.utils.mapper.AndroidManagementMapper;
 import com.google.api.services.androidmanagement.v1.model.EnrollmentToken;
 import com.google.api.services.androidmanagement.v1.model.User;
@@ -11,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.io.IOException;
 
 @Component
@@ -22,19 +22,13 @@ public class DeviceEnrollmentServiceImpl implements DeviceEnrollmentService {
     private final AndroidManagementFactory factory;
     private final SettingService settingService;
     private final AndroidManagementConfig config;
+    private final ServiceAccountKeyResolver serviceAccountKeyResolver;
 
 
     @Override
     public DeviceRegistrationResponse generateEnrollmentLink() throws IOException {
         var client = factory.getClient();
         String enterpriseName = getEnterpriseName();
-        String serviceAccountKeyPath = getServiceAccountKeyPath();
-
-
-        File keyFile = new File(serviceAccountKeyPath);
-        if (!keyFile.exists() || !keyFile.isFile()) {
-            throw new IllegalArgumentException("Key file does not exist or is not a file");
-        }
 
         if (!enterpriseName.startsWith("enterprises/")) {
             throw new IllegalStateException("Invalid enterprise name");
@@ -78,10 +72,7 @@ public class DeviceEnrollmentServiceImpl implements DeviceEnrollmentService {
                 .orElseThrow(() -> new IllegalStateException("Enterprise ID not found. Please create the enterprise first."));
     }
 
-    private String getServiceAccountKeyPath() {
-        return settingService.getSetting("serviceAccountKeyPath")
-                .orElseThrow(() -> new IllegalStateException("Missing serviceAccountKeyPath in settings"));
-    }
+
 
 
 

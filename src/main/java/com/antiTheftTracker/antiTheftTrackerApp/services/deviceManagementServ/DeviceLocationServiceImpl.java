@@ -35,4 +35,20 @@ public class DeviceLocationServiceImpl implements DeviceLocationService {
         device.setCurrentLocation(location);
         deviceEntityRepository.save(device);
     }
+
+    @Override
+    public Object getDeviceLocation(String deviceId) {
+        DeviceEntity device = deviceEntityRepository.findById(deviceId)
+                .orElse(null);
+        if (device == null || device.getCurrentLocation() == null) {
+            return null;
+        }
+        DeviceLocation location = device.getCurrentLocation();
+        return new java.util.HashMap<String, Object>() {{
+            put("deviceId", deviceId);
+            put("latitude", location.getLatitude());
+            put("longitude", location.getLongitude());
+            put("timestamp", location.getTimestamp());
+        }};
+    }
 }

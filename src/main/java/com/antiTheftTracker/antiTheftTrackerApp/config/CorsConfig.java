@@ -15,10 +15,11 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(@NonNull CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:5173", "https://*.ngrok-free.app")
+                        .allowedOriginPatterns("http://localhost:5173", "https://*.ngrok-free.app")
                         .allowedMethods("*")
                         .allowedHeaders("*")
                         .allowCredentials(true);
+
             }
         };
     }

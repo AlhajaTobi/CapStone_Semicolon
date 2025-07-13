@@ -16,10 +16,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/device")
-public class DeviceController {
+public class
+DeviceController {
 
     private final DeviceEnrollmentService deviceEnrollmentService;
     private final DeviceEntityService deviceEntityService;

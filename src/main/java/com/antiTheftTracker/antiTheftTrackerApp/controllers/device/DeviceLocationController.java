@@ -5,10 +5,14 @@ import com.antiTheftTracker.antiTheftTrackerApp.services.deviceManagementServ.De
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+
 
 @RestController
 @AllArgsConstructor
@@ -22,6 +26,15 @@ public class DeviceLocationController {
     public ResponseEntity<Void> updateDeviceLocation(@RequestBody DeviceLocationRequest request) {
         locationService.updateDeviceLocation(request.getDeviceId(), request);
         return ResponseEntity.accepted().build();
+    }
+
+    @GetMapping("/location_/{deviceId}")
+    public ResponseEntity<?> getDeviceLocation(@PathVariable String deviceId) {
+        var location = locationService.getDeviceLocation(deviceId);
+        if (location == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(location);
     }
 
 

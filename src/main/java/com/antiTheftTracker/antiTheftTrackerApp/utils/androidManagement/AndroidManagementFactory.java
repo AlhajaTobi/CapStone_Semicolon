@@ -9,7 +9,6 @@ import com.google.auth.oauth2.GoogleCredentials;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Collections;
 
@@ -18,13 +17,14 @@ import java.util.Collections;
 public class AndroidManagementFactory {
 
     private final SettingService settingService;
+    private final ServiceAccountKeyResolver serviceAccountKeyResolver;
 
 
     public AndroidManagement getClient() throws IOException {
-        String serviceAccountKeyPath = settingService.getSetting("serviceAccountKeyPath")
-                .orElseThrow(() -> new IllegalStateException("Missing serviceAccountKeyPath in settings"));
+        String serviceAccountKeyId = settingService.getSetting("serviceAccountKeyId")
+                .orElse("dev"); // Default to "dev" if not set
 
-        GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(serviceAccountKeyPath))
+        GoogleCredentials credentials = GoogleCredentials.fromStream(serviceAccountKeyResolver.resolveAsStream(serviceAccountKeyId))
                 .createScoped(Collections.singletonList("https://www.googleapis.com/auth/androidmanagement"));
 
         HttpRequestInitializer requestInitializer = request -> {
