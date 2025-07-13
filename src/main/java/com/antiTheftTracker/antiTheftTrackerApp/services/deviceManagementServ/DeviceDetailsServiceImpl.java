@@ -57,7 +57,27 @@ public class DeviceDetailsServiceImpl implements DeviceDetailsService {
 
     private Device fetchDeviceFromApi(String deviceId) throws IOException {
         var client = androidManagementFactory.getClient();
-        return client.enterprises().devices().get(deviceId).execute();
+        
+        // Try different formats for the device ID
+        String[] possibleDeviceIds = {
+            deviceId, // Try as-is
+            "enterprises/LC035h8bx2/devices/" + deviceId, // Try with enterprise prefix
+            deviceId.replace("PPR1.", "enterprises/LC035h8bx2/devices/PPR1.") // Try with enterprise prefix for PPR1 devices
+        };
+        
+        for (String id : possibleDeviceIds) {
+            try {
+                logger.info("Trying to fetch device with ID: {}", id);
+                Device device = client.enterprises().devices().get(id).execute();
+                logger.info("Successfully fetched device: {}", device.getName());
+                return device;
+            } catch (IOException e) {
+                logger.warn("Failed to fetch device with ID {}: {}", id, e.getMessage());
+                // Continue to next format
+            }
+        }
+        
+        throw new IOException("Device not found with any of the attempted ID formats");
     }
 
     private String extractDeviceId(Device device) {

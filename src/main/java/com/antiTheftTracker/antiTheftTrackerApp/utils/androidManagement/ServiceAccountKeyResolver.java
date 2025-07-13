@@ -55,7 +55,7 @@ public class ServiceAccountKeyResolver {
 
     private String getKeyFileName(String keyId) {
         return switch (keyId) {
-            case "dev" -> "service_account_config.json";
+            case "dev" -> "service-account.json";
             case "prod" -> "prod_service_account.json";
             default -> keyId + ".json";
         };
