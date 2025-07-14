@@ -11,6 +11,8 @@ import com.antiTheftTracker.antiTheftTrackerApp.utils.mapper.DeviceEntityMapper;
 import com.google.api.services.androidmanagement.v1.model.Device;
 import com.google.api.services.androidmanagement.v1.model.TelephonyInfo;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -21,21 +23,57 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class DeviceDetailsServiceImpl implements DeviceDetailsService {
+    private static final Logger logger = LoggerFactory.getLogger(DeviceDetailsServiceImpl.class);
     private final AndroidManagementFactory androidManagementFactory;
     private final DeviceDetailsRepository deviceDetailsRepository;
     private final DeviceEntityRepository deviceEntityRepository;
 
     @Override
     public DeviceDetailsResponse getDeviceDetails(String deviceId) throws IOException {
-        var device = fetchDeviceFromApi(deviceId);
+        try {
+            var device = fetchDeviceFromApi(deviceId);
 
-        DeviceEntity deviceEntity = DeviceEntityMapper.toEntity(device);
-        deviceEntityRepository.save(deviceEntity);
+            DeviceEntity deviceEntity = DeviceEntityMapper.toEntity(device);
+            deviceEntityRepository.save(deviceEntity);
 
-        DeviceDetail deviceDetail = mapToDeviceDetails(device, deviceEntity);
-        deviceDetailsRepository.save(deviceDetail);
+            DeviceDetail deviceDetail = mapToDeviceDetails(device, deviceEntity);
+            deviceDetailsRepository.save(deviceDetail);
 
-        return DeviceDetailsMapper.buildReturnResponse(deviceDetail, deviceEntity);
+            return DeviceDetailsMapper.buildReturnResponse(deviceDetail, deviceEntity);
+        } catch (IOException e) {
+            logger.warn("Failed to fetch device from API: {}. Trying local database...", e.getMessage());
+            
+            DeviceEntity deviceEntity = deviceEntityRepository.findById(deviceId)
+                    .orElseThrow(() -> new IOException("Device not found in local database either"));
+            
+            DeviceDetail deviceDetail = deviceDetailsRepository.findByDeviceId(deviceId)
+                    .stream()
+                    .findFirst()
+                    .orElse(null);
+            
+            if (deviceDetail == null) {
+                deviceDetail = new DeviceDetail();
+                deviceDetail.setId(deviceId);
+                deviceDetail.setDevice(deviceEntity);
+                deviceDetail.setDeviceModel(deviceEntity.getDeviceDetail() != null && !deviceEntity.getDeviceDetail().isEmpty() 
+                    ? deviceEntity.getDeviceDetail().get(0).getDeviceModel() : "Unknown");
+                deviceDetail.setImei(deviceEntity.getDeviceDetail() != null && !deviceEntity.getDeviceDetail().isEmpty() 
+                    ? deviceEntity.getDeviceDetail().get(0).getImei() : "Unknown");
+                
+                deviceDetail.setLatitude(deviceEntity.getLatitude());
+                deviceDetail.setLongitude(deviceEntity.getLongitude());
+                
+                deviceDetailsRepository.save(deviceDetail);
+            }
+            
+            if (deviceEntity.getLatitude() == null || deviceEntity.getLongitude() == null) {
+                deviceEntity.setLatitude(0.0);
+                deviceEntity.setLongitude(0.0);
+                deviceEntityRepository.save(deviceEntity);
+            }
+            
+            return DeviceDetailsMapper.buildReturnResponse(deviceDetail, deviceEntity);
+        }
     }
 
 
@@ -52,32 +90,22 @@ public class DeviceDetailsServiceImpl implements DeviceDetailsService {
         deviceDetail.setPhoneNumberSlot0(extractPhoneNumberSlot0(device));
         deviceDetail.setPhoneNumberSlot1(extractPhoneNumberSlot1(device));
         deviceDetail.setDevice(deviceEntity);
+        
+        deviceDetail.setLatitude(deviceEntity.getLatitude());
+        deviceDetail.setLongitude(deviceEntity.getLongitude());
+        
         return deviceDetail;
     }
 
     private Device fetchDeviceFromApi(String deviceId) throws IOException {
         var client = androidManagementFactory.getClient();
+        String fullDeviceId = "enterprises/LC035h8bx2/devices/" + deviceId;
         
-        // Try different formats for the device ID
-        String[] possibleDeviceIds = {
-            deviceId, // Try as-is
-            "enterprises/LC035h8bx2/devices/" + deviceId, // Try with enterprise prefix
-            deviceId.replace("PPR1.", "enterprises/LC035h8bx2/devices/PPR1.") // Try with enterprise prefix for PPR1 devices
-        };
-        
-        for (String id : possibleDeviceIds) {
-            try {
-                logger.info("Trying to fetch device with ID: {}", id);
-                Device device = client.enterprises().devices().get(id).execute();
-                logger.info("Successfully fetched device: {}", device.getName());
-                return device;
-            } catch (IOException e) {
-                logger.warn("Failed to fetch device with ID {}: {}", id, e.getMessage());
-                // Continue to next format
-            }
+        try {
+            return client.enterprises().devices().get(fullDeviceId).execute();
+        } catch (IOException e) {
+            throw e;
         }
-        
-        throw new IOException("Device not found with any of the attempted ID formats");
     }
 
     private String extractDeviceId(Device device) {

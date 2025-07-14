@@ -26,20 +26,21 @@ public class DeviceEntityMapper {
             imei = device.getDeviceDetail().get(0).getImei();
         }
 
-        // Use direct location fields if currentLocation is null
         Double latitude = null;
         Double longitude = null;
         LocalDateTime locationTimestamp = null;
         
-        if (location != null) {
+        if (location != null && location.getLatitude() != null && location.getLongitude() != null) {
             latitude = location.getLatitude();
             longitude = location.getLongitude();
             locationTimestamp = location.getTimestamp();
-        } else {
-            // Use direct fields from DeviceEntity
+        } else if (device.getLatitude() != null && device.getLongitude() != null) {
             latitude = device.getLatitude();
             longitude = device.getLongitude();
-            // Set timestamp to enrollment time if no location timestamp
+            locationTimestamp = device.getEnrollmentTime();
+        } else {
+            latitude = 0.0;
+            longitude = 0.0;
             locationTimestamp = device.getEnrollmentTime();
         }
 
@@ -68,6 +69,11 @@ public class DeviceEntityMapper {
         if (location != null) {
             location.setDevice(entity);
             entity.setCurrentLocation(location);
+            entity.setLatitude(location.getLatitude());
+            entity.setLongitude(location.getLongitude());
+        } else {
+            entity.setLatitude(0.0);
+            entity.setLongitude(0.0);
         }
 
         return entity;

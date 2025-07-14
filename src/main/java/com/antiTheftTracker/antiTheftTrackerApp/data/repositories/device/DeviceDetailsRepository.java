@@ -8,5 +8,6 @@ import java.util.Optional;
 public interface DeviceDetailsRepository extends JpaRepository<DeviceDetail, String> {
     Optional<DeviceDetail> findByImei(String imei);
     Optional<DeviceDetail> findBySerialNumber(String serialNumber);
+    java.util.List<DeviceDetail> findByDeviceId(String deviceId);
 
 }

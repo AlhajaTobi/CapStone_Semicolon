@@ -35,8 +35,8 @@ public class DeviceMetaDataRegImpl implements DeviceMetadataRegistration{
             newDevice.setId(deviceId);
             newDevice.setStolen(false);
             newDevice.setFcmToken(request.getFcmToken());
-            newDevice.setLatitude(request.getLatitude());
-            newDevice.setLongitude(request.getLongitude());
+            newDevice.setLatitude(request.getLatitude() != null ? request.getLatitude() : 0.0);
+            newDevice.setLongitude(request.getLongitude() != null ? request.getLongitude() : 0.0);
             newDevice.setDeviceDetail(new ArrayList<>());
 
             DeviceDetail detail = new DeviceDetail();
@@ -57,7 +57,7 @@ public class DeviceMetaDataRegImpl implements DeviceMetadataRegistration{
             deviceRepository.save(newDevice);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("Failed to register device metadata", e);
         }
     }
 

@@ -11,19 +11,24 @@ import java.time.LocalDateTime;
 public class DeviceDetailsMapper {
 
     public static DeviceDetailsResponse buildReturnResponse(DeviceDetail deviceDetail, DeviceEntity deviceEntity) {
-        // Get location data from either currentLocation or direct fields
         Double latitude = null;
         Double longitude = null;
         LocalDateTime locationTimestamp = null;
         
-        if (deviceEntity.getCurrentLocation() != null) {
+        if (deviceEntity.getCurrentLocation() != null && 
+            deviceEntity.getCurrentLocation().getLatitude() != null && 
+            deviceEntity.getCurrentLocation().getLongitude() != null) {
             latitude = deviceEntity.getCurrentLocation().getLatitude();
             longitude = deviceEntity.getCurrentLocation().getLongitude();
             locationTimestamp = deviceEntity.getCurrentLocation().getTimestamp();
-        } else {
+        } else if (deviceEntity.getLatitude() != null && deviceEntity.getLongitude() != null) {
             latitude = deviceEntity.getLatitude();
             longitude = deviceEntity.getLongitude();
-            locationTimestamp = deviceEntity.getEnrollmentTime(); // Use enrollment time as fallback
+            locationTimestamp = deviceEntity.getEnrollmentTime();
+        } else {
+            latitude = 0.0;
+            longitude = 0.0;
+            locationTimestamp = deviceEntity.getEnrollmentTime();
         }
         
         return new DeviceDetailsResponse(

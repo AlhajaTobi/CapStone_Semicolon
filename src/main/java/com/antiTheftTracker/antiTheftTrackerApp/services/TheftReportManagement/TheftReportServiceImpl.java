@@ -73,7 +73,6 @@ public class TheftReportServiceImpl implements TheftReportService {
                     notificationService.sendTheftAlert(contact, device);
                 } catch (Exception e) {
                     System.err.println("Failed to notify contact: " + contact.getName());
-                    e.printStackTrace();
                 }
             });
         }
@@ -82,13 +81,11 @@ public class TheftReportServiceImpl implements TheftReportService {
     private void updateDeviceLocation(DeviceEntity device, TheftReportRequest request) {
         DeviceLocation location = device.getCurrentLocation();
         
-        // If no location exists, create a new one
         if (location == null) {
             location = new DeviceLocation();
             location.setDevice(device);
         }
 
-        // Update location data if coordinates are provided
         if(request.getLatitude() != null && !request.getLatitude().isEmpty() && 
            request.getLongitude() != null && !request.getLongitude().isEmpty()) {
             try {
@@ -96,7 +93,6 @@ public class TheftReportServiceImpl implements TheftReportService {
                 location.setLongitude(parseDouble(request.getLongitude()));
                 location.setTimestamp(LocalDateTime.now());
             } catch (NumberFormatException e) {
-                // If parsing fails, just log the error
                 System.err.println("Failed to parse location coordinates: " + e.getMessage());
             }
         }

@@ -49,7 +49,6 @@ public class NotificationServiceImpl implements NotificationService {
                 logger.info("Email service call completed successfully");
             } catch (Exception e) {
                 logger.error("Email service failed: " + e.getMessage());
-                e.printStackTrace();
             }
         } else {
             logger.error("Email not sent - enabled: " + contact.isEmailEnabled() + ", email: " + contact.getEmail());
